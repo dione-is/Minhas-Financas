@@ -1,5 +1,7 @@
 package com.udemy.minhasfinancas.model.repository;
 
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.udemy.minhasfinancas.model.entity.Usuario;
-
 
 
 @ExtendWith(SpringExtension.class)
@@ -40,4 +41,60 @@ public class UsuarioRepositoryTest {
 		Assertions.assertThat(result).isTrue();
 		
 	}
+	
+	@Test
+	public void deveRetornarFalsoQuandoNaoHouverUsuarioCadastradoComOEmail(){
+		//cenairo
+		
+		//ação
+		boolean result =repository.existsByEmail("usuario@email.com");
+		
+		//verificacao
+				Assertions.assertThat(result).isFalse();
+	}
+	@Test
+	public void devePersistirUmUsuarioNaBaseDeDados() {
+		//cenario
+		Usuario usuario = criarUsuario();
+		//acao
+		Usuario usuarioSalvo = repository.save(usuario);
+	
+		//verificacao
+		Assertions.assertThat(usuarioSalvo.getId()).isNotNull();
+		
+
+	}
+	
+	@Test
+	public void deveBuscarUmUsuarioPorEmail() {
+		//cenairo
+		Usuario usuario = criarUsuario();
+		entityManager.persist(usuario);
+		
+		//ação
+		Optional<Usuario> result =  repository.findByEmail("usuario@email.com");
+		
+		Assertions.assertThat(result.isPresent()).isTrue();
+	}
+	
+	@Test
+	public void deveRetornarVazioAoBuscarUsuarioPorEmailQuandoNaoExisteNaBase() {
+		//cenairo
+		
+		//ação
+		Optional<Usuario> result =  repository.findByEmail("usuario@email.com");
+		
+		Assertions.assertThat(result.isPresent()).isFalse();
+	}
+	
+	public static Usuario criarUsuario() {
+		return Usuario
+				.builder()
+				.nome("nome")
+				.email("usuario@email.com")
+				.senha("senha")
+				.build();
+	}
+	
+	
 }

@@ -2,8 +2,11 @@ package com.udemy.minhasfinancas.service.impl;
 
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
+import com.udemy.minhasfinancas.exception.ErroAutenticacao;
 import com.udemy.minhasfinancas.exception.RegraNegocioException;
 import com.udemy.minhasfinancas.model.entity.Usuario;
 import com.udemy.minhasfinancas.model.repository.UsuarioRepository;
@@ -19,16 +22,28 @@ public class UsuarioServiceImpl implements UsuarioService {
 		this.repository = repository;
 	}
 	
+
 	@Override
 	public Usuario autenticar(String email, String senha) {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<Usuario> usuario = repository.findByEmail(email);
+		
+		if(usuario.isPresent()) {
+			throw new ErroAutenticacao("Usuario não Encontrado para o email informado");
+				
+		}
+		
+		if(!usuario.get().getSenha().equals(senha)) {
+			throw new ErroAutenticacao("senha invalida");
+		}
+		
+		return usuario.get();
 	}
 
 	@Override
+	@Transactional
 	public Usuario salvarUsuario(Usuario usuario) {
-		// TODO Auto-generated method stub
-		return null;
+		validarEmail(usuario.getEmail());
+		return repository.save(usuario);
 	}
 
 	@Override

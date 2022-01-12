@@ -7,5 +7,11 @@ import com.udemy.minhasfinancas.model.entity.Usuario;
 public interface UsuarioService {
 
 	void validarEmail(String email);
+
+	Usuario autenticar(String email, String senha);
+
+	Usuario salvarUsuario(Usuario usuario);
+
+	Optional<Usuario> obterPorId(Long id);
 	
 }
