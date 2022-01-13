@@ -1,5 +1,6 @@
 package com.udemy.minhasfinancas.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.data.domain.Example;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.udemy.minhasfinancas.exception.RegraNegocioException;
 import com.udemy.minhasfinancas.model.entity.Lancamento;
 import com.udemy.minhasfinancas.model.enums.StatusLancamento;
 import com.udemy.minhasfinancas.model.repository.LancamentoRepository;
@@ -27,7 +29,8 @@ public class LancamentoServiceImpl implements LancamentoService {
 	@Override
 	@Transactional
 	public Lancamento salvar(Lancamento lancamento) {
-		
+		validar(lancamento);
+		lancamento.setStatus(StatusLancamento.PENDENTE);
 		return repository.save(lancamento);
 	}
 
@@ -57,6 +60,35 @@ public class LancamentoServiceImpl implements LancamentoService {
 	public void atualizarStatus(Lancamento lancamento, StatusLancamento status) {
 		lancamento.setStatus(status);
 		atualizar(lancamento);
+		
+	}
+
+	@Override
+	public void validar(Lancamento lancamento) {
+		
+		if(lancamento.getDescricao()== null || lancamento.getDescricao().trim().equals("")) {
+			throw new RegraNegocioException("Informe uma Descrição valida!");
+		}
+		
+		if(lancamento.getMes() == null 		|| lancamento.getMes() < 1 || lancamento.getAno() > 12) {
+			throw new RegraNegocioException("Informe um Mes Valido");
+		}
+		
+		if(lancamento.getAno() == null 		|| lancamento.getAno().toString().length() != 4) {
+			throw new RegraNegocioException("Informe um Ano Valido");
+		}
+		
+		if(lancamento.getUsuario() == null 	|| lancamento.getUsuario().getId() == null) {
+			throw new RegraNegocioException("Informe um Usuario Valido");
+		}
+		
+		if(lancamento.getValor() == null 	|| lancamento.getValor().compareTo(BigDecimal.ZERO) < 1) {
+			throw new RegraNegocioException("Informe um valor Valido");
+		}
+		
+		if(lancamento.getTipo() == null) {
+			throw new RegraNegocioException("Informe um tipo de lançamento Valido");
+		}
 		
 	}
 
