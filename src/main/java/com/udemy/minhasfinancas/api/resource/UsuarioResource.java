@@ -21,6 +21,17 @@ public class UsuarioResource {
 		this.service = service;
 	}
 	
+	@PostMapping("/autenticar")
+	public ResponseEntity autenticar(@RequestBody UsuarioDTO dto) {
+		
+		try {
+			Usuario usuarioAutenticado = service.autenticar(dto.getEmail(), dto.getSenha());
+			return ResponseEntity.ok(usuarioAutenticado);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+	
 	@PostMapping
 	public ResponseEntity salvar(@RequestBody UsuarioDTO dto) {
 		
