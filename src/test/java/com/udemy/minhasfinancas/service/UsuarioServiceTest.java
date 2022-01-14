@@ -2,34 +2,35 @@ package com.udemy.minhasfinancas.service;
 
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.udemy.minhasfinancas.exception.ErroAutenticacao;
 import com.udemy.minhasfinancas.exception.RegraNegocioException;
 import com.udemy.minhasfinancas.model.entity.Usuario;
 import com.udemy.minhasfinancas.model.repository.UsuarioRepository;
+import com.udemy.minhasfinancas.service.impl.UsuarioServiceImpl;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 public class UsuarioServiceTest {
 	
 	@SpyBean
-	UsuarioService service;
+	UsuarioServiceImpl service;
 	
 	@MockBean
 	UsuarioRepository repository;
 	
 	
-	@Test(expected = Test.None.class)
+	@Test
 	public void deveSalvarUmUsuario() {
 		//cenario
 		Mockito.doNothing().when(service).validarEmail(Mockito.anyString()); 
-		Usuario usuario = Usuario.builder().nome("usuario").email("email@email.com").build();
+		Usuario usuario = Usuario.builder().id(1l).nome("nome").email("email@email.com").senha("senha").build();
 		Mockito.when(repository.save(Mockito.any(Usuario.class))).thenReturn(usuario);
 		
 		//ação
@@ -52,13 +53,14 @@ public class UsuarioServiceTest {
 		Mockito.doThrow(RegraNegocioException.class).when(service).validarEmail(email);
 		
 		//ação
-		service.salvarUsuario(usuario);
+		org.junit.jupiter.api.Assertions
+		.assertThrows(RegraNegocioException.class, () -> service.salvarUsuario(usuario) ) ;
 		
 		//verificação
 		Mockito.verify(repository, Mockito.never()).save(usuario);
 	}
 	
-	@Test(expected = Test.None.class)
+	@Test
 	public void deveAutenticarUmUsuarioComSucesso() {
 		//cenario
 		String email = "email@email.com";
@@ -74,8 +76,8 @@ public class UsuarioServiceTest {
 		Assertions.assertThat(result).isNotNull();				
 	}
 	
-	@Test(expected = ErroAutenticacao.class)
-	public void deveLancarErroQuandoNMaoEncontrarUsuarioCadastradoComOEmailInformado() {
+	@Test
+	public void deveLancarErroQuandoNaoEncontrarUsuarioCadastradoComOEmailInformado() {
 		//cenario
 		Mockito.when(repository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
 		
@@ -83,10 +85,10 @@ public class UsuarioServiceTest {
 		Throwable exception = Assertions.catchThrowable(() -> service.autenticar("email@email.com", "senha"));
 		
 		//verificao
-		Assertions.assertThat(exception).isInstanceOf(ErroAutenticacao.class).hasMessage("usuario nao encontrado para email informado");
+		Assertions.assertThat(exception).isInstanceOf(ErroAutenticacao.class).hasMessage("usuario não encontrado para o email informado");
 	}
 	
-	@Test(expected = ErroAutenticacao.class)
+	@Test
 	public void deveLancarErroQuandoSenhaNaoBater() {
 		//cenario
 		String senha = "senha";
@@ -99,7 +101,7 @@ public class UsuarioServiceTest {
 		
 	}
 	
-	@Test(expected = Test.None.class)
+	@Test
 	public void deveValidarEmail() {
 		//cenario
 		Mockito.when(repository.existsByEmail(Mockito.anyString())).thenReturn(false);
@@ -108,13 +110,15 @@ public class UsuarioServiceTest {
 		service.validarEmail("email@email.com");
 	}
 	
-	@Test(expected = RegraNegocioException.class)
+	@Test
 	public void deveLancarErroAoValidarEmailQuandoExistirEmailCadastrado() {
 		//cenario
 		Mockito.when(repository.existsByEmail(Mockito.anyString())).thenReturn(true);
-		
-		//ação
-		service.validarEmail("email@email.com");
+				
+		//acao
+		org.junit.jupiter.api.Assertions
+			.assertThrows(RegraNegocioException.class, () -> service.validarEmail("email@email.com"));
+
 	}
 	
 }
