@@ -3,6 +3,8 @@ package com.udemy.minhasfinancas.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -70,7 +72,7 @@ public class LancamentoServiceImpl implements LancamentoService {
 			throw new RegraNegocioException("Informe uma Descrição valida!");
 		}
 		
-		if(lancamento.getMes() == null 		|| lancamento.getMes() < 1 || lancamento.getAno() > 12) {
+		if(lancamento.getMes() == null 		|| lancamento.getMes() < 1 || lancamento.getMes() > 12) {
 			throw new RegraNegocioException("Informe um Mes Valido");
 		}
 		
@@ -90,6 +92,12 @@ public class LancamentoServiceImpl implements LancamentoService {
 			throw new RegraNegocioException("Informe um tipo de lançamento Valido");
 		}
 		
+	}
+
+	@Override
+	public Optional<Lancamento> obterPeloId(Long id) {
+		// TODO Auto-generated method stub
+		return repository.findById(id);
 	}
 
 }

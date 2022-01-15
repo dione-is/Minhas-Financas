@@ -12,6 +12,6 @@ public interface UsuarioService {
 
 	Usuario salvarUsuario(Usuario usuario);
 
-	Optional<Usuario> obterPorId(Long id);
+	Optional<Usuario> obterPeloId(Long id);
 	
 }
